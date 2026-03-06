@@ -85,10 +85,6 @@
             <button onclick="adminDeploy()" style="width: 100%; margin-top: 5px; background: #00ff41; color:#000; font-weight:bold;">DEPLOY (SHA256)</button>
             <button onclick="adminMint()" style="width: 100%; margin-top: 5px; background: #222; color: #fff; border: 1px solid #444;">MINT ASSETS</button>
         </div>
-        
-        <div id="view-settings" style="display: none; padding: 10px;">
-            <div>SYSTEM SETTINGS ACTIVE</div>
-        </div>
     </div>
 
     <div style="display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid #222; padding-top: 10px;">
@@ -128,7 +124,7 @@ let chain = JSON.parse(localStorage.getItem('rfof_chain')) || [];
 const MASTER_ADMIN = "RFOF-46D65B1C4A8A4FA3E3B6";
 
 const vault = {
-    current: localStorage.getItem("current_wallet_address") || null,
+    current: null,
     async access() {
         const seed = document.getElementById('seed-phrase').value;
         if(seed.length < 5) return;
@@ -139,7 +135,6 @@ const vault = {
         ui.showDashboard();
     },
     sync() {
-        if(!this.current) return;
         let balance = 0;
         chain.forEach(block => { if(block.body.miner === this.current) balance += block.body.amount; });
         document.getElementById('display-addr').innerText = this.current;
@@ -171,14 +166,6 @@ const engine = {
     }
 };
 
-/* --- ADMIN FUNKTIONEN --- */
-async function adminDeploy() {
-    const asset = document.getElementById('asset-name').value;
-    if(!asset) return;
-    ui.log("DEPLOYING ASSET: " + await cryptoLib.hash(asset));
-}
-function adminMint() { ui.log("MINTING SYSTEM ASSETS..."); }
-
 const ui = {
     showDashboard() {
         document.getElementById('auth-layer').style.display = 'none';
@@ -206,6 +193,7 @@ const ui = {
     }
 };
 
+/* --- ATOMARE TRANSACTIONAL-LOGIK & SYNCHRONISATION --- */
 async function txAction(type) {
     const amount = prompt("Betrag eingeben:");
     if (!amount || isNaN(amount)) return;
@@ -227,6 +215,7 @@ async function syncChainNodes(chainID) {
     if (el) el.innerText = localData.balance;
 }
 
+/* --- STATUS-MONITORING --- */
 setInterval(() => {
     const addr = localStorage.getItem("current_wallet_address");
     const isMaster = (addr === MASTER_ADMIN);
@@ -235,7 +224,6 @@ setInterval(() => {
     ['RFOF','PRAI','ECCU'].forEach(c => document.getElementById('s-'+c.toLowerCase()).innerText = `${c}: ${addr ? 'ACTIVE' : 'IDLE'}`);
     document.getElementById('view-toggle-btn').style.display = isMaster ? 'block' : 'none';
     document.getElementById('nav-admin').style.display = isMaster ? 'block' : 'none';
-    if(addr && document.getElementById('auth-layer').style.display !== 'none') vault.sync();
 }, 500);
 
 function toggleView() {
