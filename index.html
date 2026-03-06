@@ -4,25 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RFOF MAINNET ALPHA v6.0</title>
-    <style>
-        :root { --neon: #00f2ff; --magenta: #ff00ff; --bg: #000; --text: #fff; }
-        body { background: #050505; color: var(--text); font-family: monospace; padding: 20px; }
-        .rfof-blockchain-system { background: var(--bg); color: var(--text); padding: 15px; border: 2px solid var(--neon); border-radius: 12px; font-family: monospace; max-width: 600px; margin: auto; }
-        .module { background: #080808; border: 1px solid #222; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
-        .rfof-input { width: 100%; padding: 8px; background: #000; border: 1px solid var(--neon); color: #fff; margin-bottom: 5px; box-sizing: border-box; }
-        .main-action { width: 100%; padding: 15px; background: var(--neon); border: none; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; box-shadow: 0 0 10px var(--neon); }
-        .chain-visual { display: flex; gap: 10px; overflow-x: auto; padding: 10px; }
-        .block-unit { min-width: 60px; height: 60px; border: 1px solid var(--neon); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; font-size: 0.6rem; transition: 0.2s; }
-        .block-unit:hover { border-color: #fff; transform: scale(1.05); }
-        .details-view { font-size: 0.7rem; background: #000; padding: 10px; border: 1px solid #444; color: #00ff41; line-height: 1.4; white-space: pre-wrap; }
-        .console-module { height: 80px; overflow-y: auto; background: #000; padding: 5px; font-size: 0.6rem; color: #00ff41; border: 1px solid #222; margin-top: 10px; }
-        .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
-        .b-box { background: #151515; padding: 10px; border: 1px solid #333; text-align: center; }
-        .small-btn { font-size: 0.6rem; background: #333; color: #fff; border: none; cursor: pointer; }
-    </style>
 </head>
 <body>
-
 <div class="rfof-blockchain-system">
     <div class="system-header">
         <h2>RFOF MAINNET ALPHA v6.0</h2>
@@ -66,12 +49,13 @@
     </div>
 </div>
 
-<div class="eccu-master-container" id="prai-core-root" style="border: 2px solid #00f2ff; background: #000; padding: 20px; color: #fff; border-radius: 8px; margin-top: 20px; max-width: 600px; margin-left: auto; margin-right: auto;">
+<div class="eccu-master-container" id="prai-core-root" style="border: 2px solid #00f2ff; background: #000; padding: 20px; color: #fff; border-radius: 8px; margin-top: 20px;">
     <div style="border-bottom: 2px solid #222; padding-bottom: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center;">
             <div style="font-size: 1.1rem; color: #00f2ff; font-weight: bold;">PZQQET MASTER CORE v42</div>
             <button id="view-toggle-btn" onclick="toggleView()" style="display:none; background: #111; color: #00ff41; border: 1px solid #00ff41; font-size: 0.6rem; padding: 2px 5px; cursor: pointer;">ADMIN VIEW</button>
         </div>
+        
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px;">
             <span id="s-auth" style="font-size: 0.5rem; border: 1px solid #555; padding: 2px;">AUTH: LOGGED OUT</span>
             <span id="s-role" style="font-size: 0.5rem; border: 1px solid #555; padding: 2px;">ROLE: USER</span>
@@ -79,7 +63,9 @@
             <span id="s-prai" style="font-size: 0.5rem; border: 1px solid #555; padding: 2px;">PRAI: IDLE</span>
             <span id="s-eccu" style="font-size: 0.5rem; border: 1px solid #555; padding: 2px;">ECCU: IDLE</span>
         </div>
+        <div id="active-address" style="font-size: 0.55rem; color: #ff00ff; margin-top: 6px;">NO ACTIVE CHAIN</div>
     </div>
+
     <div id="core-viewport" style="margin-top: 20px;">
         <div id="view-user" style="display: block;">
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -92,79 +78,180 @@
                 <button onclick="txAction('WITHDRAW')" style="flex:1; background:#ff00ff; color:#000; font-weight:bold;">OUT</button>
             </div>
         </div>
+
         <div id="view-admin" style="display: none; border: 2px dashed #00ff41; padding: 15px;">
             <div style="color: #00ff41; margin-bottom: 5px;">[ADMIN CONSOLE]</div>
             <input type="text" id="asset-name" placeholder="Asset Name..." style="width: 100%; background: #000; color: #fff;">
             <button onclick="adminDeploy()" style="width: 100%; margin-top: 5px; background: #00ff41; color:#000; font-weight:bold;">DEPLOY (SHA256)</button>
+            <button onclick="adminMint()" style="width: 100%; margin-top: 5px; background: #222; color: #fff; border: 1px solid #444;">MINT ASSETS</button>
         </div>
+        
+        <div id="view-settings" style="display: none; padding: 10px;">
+            <div>SYSTEM SETTINGS ACTIVE</div>
+        </div>
+    </div>
+
+    <div style="display: flex; justify-content: space-around; margin-top: 30px; border-top: 1px solid #222; padding-top: 10px;">
+        <span onclick="switchTab('user')" style="cursor: pointer;">WALLET</span>
+        <span onclick="switchTab('admin')" id="nav-admin" style="display: none; cursor: pointer; color: #00ff41;">CORE-MGMT</span>
+        <span onclick="switchTab('settings')" style="cursor: pointer;">SETTINGS</span>
     </div>
 </div>
 
-<script>
-/* --- BACKEND & INTEGRATION --- */
-const SystemController = {
-    init() {
-        if (!localStorage.getItem("chain_registry")) {
-            localStorage.setItem("chain_registry", JSON.stringify({"RFOF": {balance: 0}, "PRAI": {balance: 0}, "ECCU": {balance: 0}}));
-        }
-        triggerReflexion();
-    },
-    terminate() { localStorage.setItem("last_sync", Date.now()); }
-};
-document.addEventListener("DOMContentLoaded", () => SystemController.init());
-window.addEventListener("beforeunload", () => SystemController.terminate());
+<style>
+    :root { --neon: #00f2ff; --magenta: #ff00ff; --bg: #000; --text: #fff; }
+    .rfof-blockchain-system { background: var(--bg); color: var(--text); padding: 15px; border: 2px solid var(--neon); border-radius: 12px; font-family: monospace; max-width: 600px; margin: auto; }
+    .module { background: #080808; border: 1px solid #222; padding: 12px; border-radius: 8px; margin-bottom: 10px; }
+    .rfof-input { width: 100%; padding: 8px; background: #000; border: 1px solid var(--neon); color: #fff; margin-bottom: 5px; }
+    .main-action { width: 100%; padding: 15px; background: var(--neon); border: none; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; box-shadow: 0 0 10px var(--neon); }
+    .chain-visual { display: flex; gap: 10px; overflow-x: auto; padding: 10px; }
+    .block-unit { min-width: 60px; height: 60px; border: 1px solid var(--neon); cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #111; font-size: 0.6rem; transition: 0.2s; }
+    .block-unit:hover { border-color: #fff; transform: scale(1.05); }
+    .details-view { font-size: 0.7rem; background: #000; padding: 10px; border: 1px solid #444; color: #00ff41; line-height: 1.4; white-space: pre-wrap; }
+    .console-module { height: 80px; overflow-y: auto; background: #000; padding: 5px; font-size: 0.6rem; color: #00ff41; border: 1px solid #222; }
+    .balance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 5px; }
+    .b-box { background: #151515; padding: 10px; border: 1px solid #333; text-align: center; }
+    .small-btn { font-size: 0.6rem; background: #333; color: #fff; border: none; cursor: pointer; }
+</style>
 
-/* --- KERN-LOGIK --- */
-const cryptoLib = { async hash(data) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(data)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join(''); } };
+<script>
+/* --- KERN-LOGIK & API-INTEGRATION --- */
+const cryptoLib = {
+    async hash(data) {
+        const msgBuffer = new TextEncoder().encode(data);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+};
+
 let chain = JSON.parse(localStorage.getItem('rfof_chain')) || [];
 const MASTER_ADMIN = "RFOF-46D65B1C4A8A4FA3E3B6";
 
 const vault = {
-    current: localStorage.getItem("current_wallet_address"),
+    current: localStorage.getItem("current_wallet_address") || null,
     async access() {
         const seed = document.getElementById('seed-phrase').value;
         if(seed.length < 5) return;
         const addr = "RFOF-" + (await cryptoLib.hash(seed)).substring(0, 20).toUpperCase();
+        this.current = addr;
         localStorage.setItem("current_wallet_address", addr);
-        location.reload();
+        this.sync();
+        ui.showDashboard();
     },
-    generate() { alert("SPEICHERN:\n" + Array.from({length:12}, () => Math.random().toString(36).substring(2,7)).join(' ')); },
+    sync() {
+        if(!this.current) return;
+        let balance = 0;
+        chain.forEach(block => { if(block.body.miner === this.current) balance += block.body.amount; });
+        document.getElementById('display-addr').innerText = this.current;
+        document.getElementById('bal-eccu').innerText = balance.toFixed(8);
+        document.getElementById('bal-euro').innerText = (balance * 2.5).toFixed(2) + " €";
+        ui.renderChain();
+    },
+    generate() {
+        const words = Array.from({length: 12}, () => Math.random().toString(36).substring(2, 7)).join(' ');
+        document.getElementById('seed-phrase').value = words;
+        alert("SPEICHERN FÜR IMMER:\n" + words);
+    },
     logout() { localStorage.removeItem("current_wallet_address"); location.reload(); }
 };
 
 const engine = {
     async mint() {
         if(!vault.current) return;
-        const block = { head: { index: chain.length, timestamp: Date.now() }, body: { miner: vault.current, amount: 0.00096093 } };
+        const prevHash = chain.length > 0 ? chain[chain.length - 1].head.hash : "0".repeat(64);
+        const block = {
+            head: { index: chain.length, timestamp: Date.now(), prevHash: prevHash, hash: "" },
+            body: { miner: vault.current, amount: 0.00096093, energy: "8.5899 Joule", formula: "PZQQET-Axiom-1" }
+        };
+        block.head.hash = await cryptoLib.hash(JSON.stringify(block.body) + block.head.prevHash);
         chain.push(block);
         localStorage.setItem('rfof_chain', JSON.stringify(chain));
-        ui.log("BLOCK MINED");
-        location.reload();
+        vault.sync();
+        ui.log(`BLOCK #${block.head.index} MINED.`);
     }
 };
 
+/* --- ADMIN FUNKTIONEN --- */
+async function adminDeploy() {
+    const asset = document.getElementById('asset-name').value;
+    if(!asset) return;
+    ui.log("DEPLOYING ASSET: " + await cryptoLib.hash(asset));
+}
+function adminMint() { ui.log("MINTING SYSTEM ASSETS..."); }
+
 const ui = {
-    showDashboard() { document.getElementById('auth-layer').style.display = 'none'; document.getElementById('dashboard').style.display = 'block'; },
+    showDashboard() {
+        document.getElementById('auth-layer').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+    },
+    renderChain() {
+        const track = document.getElementById('blockchain-track');
+        track.innerHTML = "";
+        chain.forEach(block => {
+            const el = document.createElement('div');
+            el.className = 'block-unit';
+            el.innerHTML = `ID:${block.head.index}<br>ECCU`;
+            el.onclick = () => this.inspect(block);
+            track.appendChild(el);
+        });
+    },
+    inspect(block) {
+        document.getElementById('inspector').style.display = 'block';
+        document.getElementById('block-details').innerText = JSON.stringify(block, null, 2);
+    },
     closeInspector() { document.getElementById('inspector').style.display = 'none'; },
-    log(msg) { document.getElementById('console-logs').innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}<br>` + document.getElementById('console-logs').innerHTML; }
+    log(msg) {
+        const c = document.getElementById('console-logs');
+        c.innerHTML = `[${new Date().toLocaleTimeString()}] ${msg}<br>` + c.innerHTML;
+    }
 };
 
-function txAction(type) {
-    const amount = parseFloat(prompt("Betrag:"));
-    if(isNaN(amount)) return;
-    let reg = JSON.parse(localStorage.getItem("chain_registry"));
-    reg['RFOF'].balance = (type === 'DEPOSIT') ? (parseFloat(reg['RFOF'].balance) + amount) : Math.max(0, reg['RFOF'].balance - amount);
-    localStorage.setItem("chain_registry", JSON.stringify(reg));
+async function txAction(type) {
+    const amount = prompt("Betrag eingeben:");
+    if (!amount || isNaN(amount)) return;
+    let registry = JSON.parse(localStorage.getItem("chain_registry") || "{}");
+    const asset = "RFOF"; 
+    const currentBalance = parseFloat(registry[asset]?.balance || 0);
+    if (type === 'DEPOSIT') registry[asset] = { balance: (currentBalance + parseFloat(amount)).toFixed(2) };
+    else if (type === 'WITHDRAW') registry[asset] = { balance: Math.max(0, currentBalance - parseFloat(amount)).toFixed(2) };
+    localStorage.setItem("chain_registry", JSON.stringify(registry));
     triggerReflexion();
 }
 
-function triggerReflexion() { ['RFOF','PRAI','ECCU'].forEach(id => { 
-    const val = JSON.parse(localStorage.getItem("chain_registry"))[id]?.balance || 0; 
-    const el = document.getElementById('u-'+id.toLowerCase()); 
-    if(el) el.innerText = val.toFixed(2); 
-})};
+function triggerReflexion() { ['RFOF', 'PRAI', 'ECCU'].forEach(chain => syncChainNodes(chain)); }
 
-function toggleView() { document.getElementById('view-admin').style.display = (document.getElementById('view-admin').style.display === 'none') ? 'block' : 'none'; }
+async function syncChainNodes(chainID) {
+    const registry = JSON.parse(localStorage.getItem("chain_registry") || "{}");
+    const localData = registry[chainID] || { balance: 0.00 };
+    const el = document.getElementById('u-' + chainID.toLowerCase());
+    if (el) el.innerText = localData.balance;
+}
+
+setInterval(() => {
+    const addr = localStorage.getItem("current_wallet_address");
+    const isMaster = (addr === MASTER_ADMIN);
+    document.getElementById('s-auth').innerText = addr ? 'AUTH: LOGGED IN' : 'AUTH: LOGGED OUT';
+    document.getElementById('s-role').innerText = isMaster ? 'ROLE: ADMIN' : 'ROLE: USER';
+    ['RFOF','PRAI','ECCU'].forEach(c => document.getElementById('s-'+c.toLowerCase()).innerText = `${c}: ${addr ? 'ACTIVE' : 'IDLE'}`);
+    document.getElementById('view-toggle-btn').style.display = isMaster ? 'block' : 'none';
+    document.getElementById('nav-admin').style.display = isMaster ? 'block' : 'none';
+    if(addr && document.getElementById('auth-layer').style.display !== 'none') vault.sync();
+}, 500);
+
+function toggleView() {
+    const vU = document.getElementById('view-user');
+    const vA = document.getElementById('view-admin');
+    const btn = document.getElementById('view-toggle-btn');
+    const isShowingAdmin = (vA.style.display === 'block');
+    vU.style.display = isShowingAdmin ? 'block' : 'none';
+    vA.style.display = isShowingAdmin ? 'none' : 'block';
+    btn.innerText = isShowingAdmin ? "ADMIN VIEW" : "USER VIEW";
+}
+
+function switchTab(view) {
+    document.querySelectorAll('[id^="view-"]').forEach(v => v.style.display = 'none');
+    document.getElementById('view-' + view).style.display = 'block';
+}
 
 document.getElementById('mint-trigger').addEventListener('click', () => engine.mint());
 </script>
